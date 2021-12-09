@@ -1,13 +1,26 @@
+#
+# Generating an eeprom file for ftdi 2232/4232
+#
 
+# eeprom file name
 eeprom_name = 'eeprom.bin'
 
+# User area data.
+# 128 bytes of any data. 
 ua = [0]*128
 n = 0
 for i in 'User area':
     ua[n] = ord(i)
     n+=1
+
+# Vendor area data.
+# Unicode string.
 va = 'Vendor area'
+# Product area data.
+# Unicode string.
 pa = 'Product area'
+# Serial area data.
+# Unicode string.
 sa = 'Serial area'
 
 # import user
@@ -297,12 +310,15 @@ n+=1
 eeprom[n] = int(pnp_options[2:],base=16)
 n+=1
 
-
+#---------------------------------------------------------
+#  Calculating the checksum
 checksum=0xaaaa
 for i in range(0,len(eeprom)-2,2):
     v=eeprom[i+1]<<8 | eeprom[i]
     checksum=v^checksum
     checksum=((checksum << 1)|(checksum >> 15)) & 0xffff
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 eeprom[254] = checksum & 0xff
 eeprom[255] = (checksum >> 8) & 0xff
 
